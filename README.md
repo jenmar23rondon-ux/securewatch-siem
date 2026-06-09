@@ -19,6 +19,8 @@ This first version includes:
 - Threat and alert creation
 - Dashboard metrics
 - WebSocket events in realtime: `new-event`, `new-alert`, `metrics-update`
+- React Query API state management
+- React Hook Form + Zod validation for frontend forms
 - CSV alert report
 - PDF alert report
 - Attacker IP map
@@ -29,7 +31,7 @@ This first version includes:
 ## Architecture
 
 ```text
-Frontend React
+Frontend React + TypeScript
       |
       v
 Backend Node.js / Express
@@ -102,6 +104,18 @@ securewatch-siem/
 | Port scan | Many different ports from the same source |
 | ML anomaly | IsolationForest flags unusual failed logins, request volume, ports or payload risk |
 | Correlation | Same IP appears across multiple log sources in a short window |
+
+## Frontend Stack
+
+The dashboard frontend is built with a modern React stack:
+
+- React + TypeScript
+- TailwindCSS-ready styling pipeline
+- React Query for API caching, loading states and refetching
+- Socket.IO Client for realtime alerts and metrics
+- Recharts for dashboard charts
+- React Hook Form + Zod for validated forms
+- Lucide React for dashboard icons
 
 ## Local Setup
 

@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   --bg: #070b13;
   --surface: #0c1322;
@@ -71,6 +75,11 @@ button,
 button:hover,
 .button-link:hover {
   background: var(--primary-hover);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
 }
 
 input,
@@ -364,6 +373,12 @@ th {
   border-radius: 6px;
   color: var(--error-text);
   padding: 0.8rem;
+}
+
+.field-error {
+  color: var(--error-text);
+  font-size: 0.78rem;
+  margin-top: -0.45rem;
 }
 
 @media (max-width: 900px) {

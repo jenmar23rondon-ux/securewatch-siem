@@ -1,3 +1,4 @@
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, Globe2, ShieldAlert, Siren, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -17,22 +18,25 @@ type DashboardData = {
 };
 
 export function Dashboard() {
-  const [data, setData] = useState<DashboardData | null>(null);
   const [liveAlerts, setLiveAlerts] = useState<Alert[]>([]);
+  const queryClient = useQueryClient();
 
-  async function load() {
-    const res = await api.get("/dashboard");
-    setData(res.data);
-  }
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["dashboard"],
+    queryFn: async () => {
+      const res = await api.get<DashboardData>("/dashboard");
+      return res.data;
+    },
+    refetchInterval: 60_000
+  });
 
   useEffect(() => {
-    load();
     alertsSocket.connect();
     alertsSocket.on("metrics-update", (metrics: DashboardData) => {
-      setData(metrics);
+      queryClient.setQueryData(["dashboard"], metrics);
     });
     alertsSocket.on("new-event", (event: SecurityEvent) => {
-      setData((current) => current ? {
+      queryClient.setQueryData<DashboardData>(["dashboard"], (current) => current ? {
         ...current,
         recentEvents: [event, ...(current.recentEvents || [])].slice(0, 10)
       } : current);
@@ -42,7 +46,7 @@ export function Dashboard() {
     });
     alertsSocket.on("alert:new", (alert: Alert) => {
       setLiveAlerts((items) => [alert, ...items].slice(0, 5));
-      load();
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     });
     return () => {
       alertsSocket.off("alert:new");
@@ -51,7 +55,7 @@ export function Dashboard() {
       alertsSocket.off("metrics-update");
       alertsSocket.disconnect();
     };
-  }, []);
+  }, [queryClient]);
 
   const hourlyData = (data?.eventsByHour || [])
     .slice()
@@ -65,6 +69,8 @@ export function Dashboard() {
     <main className="page">
       <h1>Security Command Center</h1>
       <p className="muted">Live monitoring for events, threats and alerts.</p>
+      {isLoading && <p className="muted">Loading live security metrics...</p>}
+      {isError && <div className="error">Could not load dashboard metrics</div>}
       <div className="stats-grid">
         <StatCard title="Total events" value={data?.totalEvents ?? 0} icon={Siren} />
         <StatCard title="Open alerts" value={data?.openAlerts ?? 0} icon={AlertTriangle} />
