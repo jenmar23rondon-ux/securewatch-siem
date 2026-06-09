@@ -18,11 +18,22 @@ function Protected({ user, children }: { user: AuthUser | null; children: JSX.El
 
 export default function App() {
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
 
   useEffect(() => {
     const raw = localStorage.getItem("securewatch_user");
     if (raw) setUser(JSON.parse(raw));
+
+    const savedTheme = localStorage.getItem("securewatch_theme");
+    if (savedTheme === "light" || savedTheme === "dark") {
+      setTheme(savedTheme);
+    }
   }, []);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem("securewatch_theme", theme);
+  }, [theme]);
 
   function logout() {
     localStorage.removeItem("securewatch_token");
@@ -32,7 +43,12 @@ export default function App() {
 
   return (
     <>
-      <Navbar user={user} onLogout={logout} />
+      <Navbar
+        user={user}
+        onLogout={logout}
+        theme={theme}
+        onToggleTheme={() => setTheme((current) => current === "dark" ? "light" : "dark")}
+      />
       <Routes>
         <Route path="/login" element={<Login onLogin={setUser} />} />
         <Route path="/" element={<Protected user={user}><Dashboard /></Protected>} />

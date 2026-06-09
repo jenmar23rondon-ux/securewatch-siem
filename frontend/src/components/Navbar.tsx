@@ -1,4 +1,4 @@
-import { AlertTriangle, BarChart3, FileText, LogOut, Radar, Server, Shield, Users } from "lucide-react";
+import { AlertTriangle, BarChart3, FileText, LogOut, Moon, Radar, Server, Shield, Sun, Users } from "lucide-react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { AuthUser } from "../types";
 
@@ -12,8 +12,16 @@ const links = [
   { to: "/reports", label: "Reports", icon: FileText }
 ];
 
-export function Navbar({ user, onLogout }: { user: AuthUser | null; onLogout: () => void }) {
+type NavbarProps = {
+  user: AuthUser | null;
+  onLogout: () => void;
+  theme: "dark" | "light";
+  onToggleTheme: () => void;
+};
+
+export function Navbar({ user, onLogout, theme, onToggleTheme }: NavbarProps) {
   const navigate = useNavigate();
+  const ThemeIcon = theme === "dark" ? Sun : Moon;
 
   return (
     <nav className="topbar">
@@ -36,6 +44,14 @@ export function Navbar({ user, onLogout }: { user: AuthUser | null; onLogout: ()
           </div>
           <div className="session">
             <span>{user.name} ({user.role})</span>
+            <button
+              className="theme-toggle icon-button"
+              onClick={onToggleTheme}
+              title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            >
+              <ThemeIcon size={18} />
+            </button>
             <button
               className="danger icon-button"
               onClick={() => {
