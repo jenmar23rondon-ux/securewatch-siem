@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  ANALYST
+  VIEWER
+}
+
+enum LogSourceType {
+  API_GATEWAY
+  LINUX_SERVER
+  AUTH_SERVICE
+  FIREWALL
+  DATABASE
+}
+
+enum EventType {
+  LOGIN_SUCCESS
+  LOGIN_FAILED
+  SQL_INJECTION_ATTEMPT
+  DDOS_ATTEMPT
+  PORT_SCAN
+  SUSPICIOUS_IP
+}
+
+enum Severity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum AlertStatus {
+  OPEN
+  ACKNOWLEDGED
+  RESOLVED
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(VIEWER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model LogSource {
+  id          Int           @id @default(autoincrement())
+  name        String
+  type        LogSourceType
+  description String?
+  active      Boolean       @default(true)
+  events      SecurityEvent[]
+  createdAt   DateTime      @default(now())
+}
+
+model SecurityEvent {
+  id             Int       @id @default(autoincrement())
+  type           EventType
+  sourceId       Int
+  source         LogSource @relation(fields: [sourceId], references: [id])
+  ip             String
+  payload        String?
+  path           String?
+  method         String?
+  port           Int?
+  requestCount   Int       @default(1)
+  failedAttempts Int       @default(0)
+  severity       Severity  @default(LOW)
+  createdAt      DateTime  @default(now())
+  threats        Threat[]
+  alerts         Alert[]
+}
+
+model Threat {
+  id        Int           @id @default(autoincrement())
+  eventId   Int
+  event     SecurityEvent @relation(fields: [eventId], references: [id])
+  name      String
+  rule      String
+  severity  Severity
+  score     Int
+  createdAt DateTime      @default(now())
+}
+
+model Alert {
+  id        Int           @id @default(autoincrement())
+  eventId   Int
+  event     SecurityEvent @relation(fields: [eventId], references: [id])
+  title     String
+  message   String
+  severity  Severity
+  status    AlertStatus   @default(OPEN)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model Report {
+  id        Int      @id @default(autoincrement())
+  title     String
+  type      String
+  content   String
+  createdAt DateTime @default(now())
+}
