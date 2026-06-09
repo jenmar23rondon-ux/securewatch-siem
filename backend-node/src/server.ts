@@ -3,6 +3,7 @@ import { Server } from "socket.io";
 import { app } from "./app";
 import { env } from "./config/env";
 import { setSocketServer } from "./utils/realtime";
+import { startEventWorker } from "./workers/eventQueue";
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -10,6 +11,7 @@ const io = new Server(server, {
 });
 
 setSocketServer(io);
+startEventWorker();
 
 io.on("connection", (socket) => {
   console.log(`Socket connected: ${socket.id}`);

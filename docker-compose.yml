@@ -33,6 +33,7 @@ services:
       JWT_EXPIRES_IN: 7d
       FRONTEND_ORIGIN: http://localhost:5173
       ANALYZER_URL: http://analyzer-python:8000
+      REDIS_URL: redis://redis:6379
     ports:
       - "3000:3000"
 

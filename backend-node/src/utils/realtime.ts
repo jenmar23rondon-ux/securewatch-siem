@@ -7,5 +7,14 @@ export function setSocketServer(server: Server) {
 }
 
 export function emitAlert(alert: unknown) {
+  io?.emit("new-alert", alert);
   io?.emit("alert:new", alert);
+}
+
+export function emitEvent(event: unknown) {
+  io?.emit("new-event", event);
+}
+
+export function emitMetricsUpdate(metrics: unknown) {
+  io?.emit("metrics-update", metrics);
 }

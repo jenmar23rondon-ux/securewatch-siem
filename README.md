@@ -13,18 +13,18 @@ This first version includes:
 - Security event storage
 - SQL injection detection
 - Brute-force detection
+- Event queue with Bull + Redis
+- Python analyzer with Scikit-learn `IsolationForest`
+- Event correlation by IP across multiple log sources
 - Threat and alert creation
 - Dashboard metrics
-- WebSocket alerts in realtime
+- WebSocket events in realtime: `new-event`, `new-alert`, `metrics-update`
 - CSV alert report
-
-Prepared for later:
-
-- Redis queues
-- Advanced Python analyzer integration
-- PDF reports
-- AI models
-- GitHub Actions
+- PDF alert report
+- Attacker IP map
+- Visual event timeline
+- Docker Compose for PostgreSQL, Redis, backend, analyzer and frontend
+- GitHub Actions CI for builds, Docker validation and container builds
 
 ## Architecture
 
@@ -36,11 +36,11 @@ Backend Node.js / Express
       |
       +--> PostgreSQL
       |
-      +--> WebSocket alerts
+      +--> WebSocket events, alerts and metrics
       |
-      +--> Python FastAPI analyzer
+      +--> Bull + Redis event queue
       |
-      +--> Redis queue-ready service
+      +--> Python FastAPI analyzer with IsolationForest
 ```
 
 ## Project Structure
@@ -100,6 +100,8 @@ securewatch-siem/
 | SQL injection | Payload contains patterns like `' OR 1=1` |
 | DDoS signal | 100 requests per minute |
 | Port scan | Many different ports from the same source |
+| ML anomaly | IsolationForest flags unusual failed logins, request volume, ports or payload risk |
+| Correlation | Same IP appears across multiple log sources in a short window |
 
 ## Local Setup
 
@@ -131,7 +133,7 @@ Password: Admin1234
 
 ```bash
 cd analyzer-python
-py -m venv .venv
+py -3.12 -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
@@ -174,6 +176,8 @@ This starts:
 - Node backend
 - React frontend
 
+Docker is the easiest way to run the complete stack because Redis and PostgreSQL start automatically with the app.
+
 ## Useful API Flow
 
 Login:
@@ -202,16 +206,30 @@ Example event:
 }
 ```
 
-If a rule matches, SecureWatch creates:
+The API queues the event in Redis. A Bull worker processes it, calls the Python analyzer, stores the result and emits realtime updates. If a rule matches, SecureWatch creates:
 
 - A security event
 - A threat record
 - An alert
 - A realtime WebSocket notification
 
+Realtime WebSocket events:
+
+```text
+new-event
+new-alert
+metrics-update
+```
+
+Reports:
+
+```http
+GET /reports/alerts.csv
+GET /reports/alerts.pdf
+```
+
 ## Notes
 
 - `.env` files are ignored by Git.
 - This is an educational SIEM MVP, not a production SOC platform.
-- The Node backend performs MVP detection directly.
-- The Python analyzer is ready for the next phase of advanced analysis.
+- Detection combines Node rules, Python ML analysis and basic event correlation.

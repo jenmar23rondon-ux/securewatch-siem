@@ -1,7 +1,7 @@
 import { EventType } from "@prisma/client";
 import { Request, Response } from "express";
 import { z } from "zod";
-import { createSecurityEvent, listSecurityEvents } from "./events.service";
+import { enqueueSecurityEvent, listSecurityEvents } from "./events.service";
 
 const createEventSchema = z.object({
   type: z.nativeEnum(EventType),
@@ -22,6 +22,6 @@ export async function listEvents(_req: Request, res: Response) {
 
 export async function createEvent(req: Request, res: Response) {
   const data = createEventSchema.parse(req.body);
-  const event = await createSecurityEvent(data);
-  return res.status(201).json(event);
+  const result = await enqueueSecurityEvent(data);
+  return res.status(result.queued ? 202 : 201).json(result);
 }
