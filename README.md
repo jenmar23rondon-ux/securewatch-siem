@@ -15,6 +15,7 @@ This first version includes:
 - Brute-force detection
 - Event queue with Bull + Redis
 - Python analyzer with Scikit-learn `IsolationForest`
+- Self-training anomaly model using low-risk events from PostgreSQL
 - Event correlation by IP across multiple log sources
 - Threat and alert creation
 - Dashboard metrics
@@ -103,6 +104,7 @@ securewatch-siem/
 | DDoS signal | 100 requests per minute |
 | Port scan | Many different ports from the same source |
 | ML anomaly | IsolationForest flags unusual failed logins, request volume, ports or payload risk |
+| Self-training | Node reads low-risk PostgreSQL events and retrains the Python model periodically |
 | Correlation | Same IP appears across multiple log sources in a short window |
 
 ## Frontend Stack
@@ -234,6 +236,34 @@ new-event
 new-alert
 metrics-update
 ```
+
+Python analyzer training:
+
+```http
+GET /threats/analyzer/status
+POST /threats/analyzer/train
+Authorization: Bearer ADMIN_OR_ANALYST_TOKEN
+```
+
+How the self-training flow works:
+
+```text
+PostgreSQL security_events
+      |
+      v
+Node training worker selects LOW severity events
+      |
+      v
+Node converts events into ML vectors
+      |
+      v
+Python FastAPI /train endpoint
+      |
+      v
+IsolationForest retrains in memory
+```
+
+The Python analyzer starts with a fallback baseline so the project works with an empty database. Once enough low-risk events exist, the backend automatically retrains the model every 10 minutes using real historical events.
 
 Reports:
 

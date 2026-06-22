@@ -3,6 +3,7 @@ import { Server } from "socket.io";
 import { app } from "./app";
 import { env } from "./config/env";
 import { setSocketServer } from "./utils/realtime";
+import { startAnalyzerTrainingLoop } from "./workers/analyzerTraining";
 import { startEventWorker } from "./workers/eventQueue";
 
 const server = http.createServer(app);
@@ -12,6 +13,7 @@ const io = new Server(server, {
 
 setSocketServer(io);
 startEventWorker();
+startAnalyzerTrainingLoop();
 
 io.on("connection", (socket) => {
   console.log(`Socket connected: ${socket.id}`);
