@@ -2,6 +2,18 @@
 
 SecureWatch SIEM is a junior security monitoring platform that simulates a small SOC workflow: it receives security events, detects basic threats, stores evidence in PostgreSQL and shows alerts in a live dashboard.
 
+## Project Identity
+
+**SecureWatch SIEM** is a realtime SIEM-style project focused on event ingestion, Redis queue processing, threat detection, correlation, WebSocket updates and security reporting.
+
+## Screenshots
+
+The screenshot below uses sanitized demo data and documentation IP ranges.
+
+### Realtime SIEM dashboard
+
+<img src="docs/screenshots/securewatch-dashboard.svg" alt="SecureWatch realtime SIEM dashboard" width="900" />
+
 ## MVP Scope
 
 This first version includes:
@@ -176,6 +188,13 @@ Frontend URL:
 http://localhost:5173
 ```
 
+Demo credentials:
+
+```text
+Email: admin@securewatch.local
+Password: Admin1234
+```
+
 ## Docker
 
 If Docker is installed:
@@ -277,3 +296,26 @@ GET /reports/alerts.pdf
 - `.env` files are ignored by Git.
 - This is an educational SIEM MVP, not a production SOC platform.
 - Detection combines Node rules, Python ML analysis and basic event correlation.
+
+## Testing
+
+- Backend TypeScript build validation.
+- Frontend Vite build validation.
+- Python analyzer syntax validation.
+- Docker Compose configuration validation.
+- Recommended next tests: auth, role permissions, event ingestion, alert creation and report exports.
+
+## What I Learned
+
+- JWT authentication and RBAC for security dashboards.
+- Security event modeling in PostgreSQL.
+- Background jobs with Redis and Bull.
+- Realtime WebSocket updates for alerts and metrics.
+- Threat correlation by IP and source.
+- Python FastAPI analyzer integration.
+- IsolationForest anomaly detection and self-training with low-risk events.
+- Docker Compose for a multi-service SIEM stack.
+
+## License
+
+MIT License.
