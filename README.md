@@ -6,6 +6,19 @@ SecureWatch SIEM is a junior security monitoring platform that simulates a small
 
 **SecureWatch SIEM** is a realtime SIEM-style project focused on event ingestion, Redis queue processing, threat detection, correlation, WebSocket updates and security reporting.
 
+## Live Demo
+
+[Open SecureWatch SIEM](https://securewatch-siem.vercel.app)
+
+Demo credentials:
+
+```text
+Email: admin@securewatch.local
+Password: Admin1234
+```
+
+> This is an educational portfolio environment. Demo data may be changed or reset.
+
 ## Screenshots
 
 The screenshot below uses sanitized demo data and documentation IP ranges.
@@ -315,6 +328,13 @@ GET /reports/alerts.pdf
 - Python FastAPI analyzer integration.
 - IsolationForest anomaly detection and self-training with low-risk events.
 - Docker Compose for a multi-service SIEM stack.
+
+## Author
+
+Built by Jenmar Rondon.
+
+- GitHub: [jenmar23rondon-ux](https://github.com/jenmar23rondon-ux)
+- Repository: [securewatch-siem](https://github.com/jenmar23rondon-ux/securewatch-siem)
 
 ## License
 
